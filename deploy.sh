@@ -135,10 +135,19 @@ server {
 
 server {
     listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name styroaction.pl www.styroaction.pl;
 
     ssl_certificate /etc/letsencrypt/live/styroaction.pl/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/styroaction.pl/privkey.pem;
+
+    # SSL Configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Wyłącz HTTP/3 (QUIC) - wymuś tylko HTTP/2
+    add_header Alt-Svc 'h2=":443"; ma=86400' always;
 EOF
 else
     # Konfiguracja bez SSL (tylko HTTP)
@@ -156,6 +165,7 @@ sudo tee -a /etc/nginx/sites-available/styroaction.pl > /dev/null <<EOF
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     location / {
         proxy_pass http://localhost:3000;
@@ -191,10 +201,19 @@ server {
 
 server {
     listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name api.styroaction.pl;
 
     ssl_certificate /etc/letsencrypt/live/api.styroaction.pl/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/api.styroaction.pl/privkey.pem;
+
+    # SSL Configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Wyłącz HTTP/3 (QUIC) - wymuś tylko HTTP/2
+    add_header Alt-Svc 'h2=":443"; ma=86400' always;
 EOF
 else
     # Konfiguracja bez SSL (tylko HTTP)
@@ -212,6 +231,7 @@ sudo tee -a /etc/nginx/sites-available/api.styroaction.pl > /dev/null <<EOF
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     # CORS headers (jeśli potrzebne)
     add_header Access-Control-Allow-Origin "https://styroaction.pl" always;
