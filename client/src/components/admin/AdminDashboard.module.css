@@ -1,0 +1,92 @@
+.dashboard {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.header {
+  background: #2c3e50;
+  color: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.logoutButton {
+  padding: 10px 20px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.logoutButton:hover {
+  background: #c0392b;
+}
+
+.nav {
+  background: white;
+  padding: 0 40px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  gap: 10px;
+}
+
+.navButton {
+  padding: 15px 25px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: #7f8c8d;
+  transition: all 0.3s ease;
+}
+
+.navButton:hover {
+  color: #2c3e50;
+  background: #f8f9fa;
+}
+
+.navButton.active {
+  color: #3498db;
+  border-bottom-color: #3498db;
+}
+
+.content {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 15px 20px;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .nav {
+    padding: 0 20px;
+    overflow-x: auto;
+  }
+
+  .content {
+    padding: 20px;
+  }
+}
+
