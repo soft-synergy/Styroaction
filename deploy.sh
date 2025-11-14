@@ -233,10 +233,10 @@ sudo tee -a /etc/nginx/sites-available/api.styroaction.pl > /dev/null <<EOF
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # CORS headers (jeśli potrzebne)
-    add_header Access-Control-Allow-Origin "https://styroaction.pl" always;
+    # CORS headers - allow all
+    add_header Access-Control-Allow-Origin "*" always;
     add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
-    add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
+    add_header Access-Control-Allow-Headers "*" always;
 
     location / {
         proxy_pass http://localhost:5003;

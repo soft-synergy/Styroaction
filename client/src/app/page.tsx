@@ -600,7 +600,7 @@ function HomeContent() {
           <div className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
             <a href="mailto:info@soft-synergy.com" className="hover:underline font-semibold">
-              info@soft-synergy.com
+              info@styroaction.pl
             </a>
           </div>
           <div className="text-xs sm:text-sm opacity-90">
@@ -1033,7 +1033,7 @@ function HomeContent() {
                 <li className="flex items-center justify-center md:justify-start gap-2">
                   <Mail className="h-5 w-5" />
                   <a href="mailto:info@soft-synergy.com" className="hover:text-white">
-                    info@soft-synergy.com
+                    info@styroaction.pl
                   </a>
                 </li>
                 <li className="flex items-center justify-center md:justify-start gap-2">
