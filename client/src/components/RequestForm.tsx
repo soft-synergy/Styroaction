@@ -207,7 +207,7 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
                   notes: item.notes || undefined,
                 };
               })
-              .filter(Boolean)
+              .filter((item): item is NonNullable<typeof item> => item !== null)
           : undefined;
 
       if (requestMode === 'guided' && (!preparedGuidedItems || preparedGuidedItems.length === 0)) {
