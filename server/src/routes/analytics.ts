@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { PipelineStage } from 'mongoose';
 import AnalyticsEvent from '../models/AnalyticsEvent';
 
 const router = express.Router();
@@ -35,9 +36,9 @@ router.get('/summary', async (req: Request, res: Response) => {
       }
     }
 
-    const pipeline: Record<string, any>[] = [];
+    const pipeline: PipelineStage[] = [];
     if (Object.keys(match).length) {
-      pipeline.push({ $match: match });
+      pipeline.push({ $match: match } as PipelineStage);
     }
 
     pipeline.push(
@@ -46,15 +47,15 @@ router.get('/summary', async (req: Request, res: Response) => {
           _id: { variant: '$variant', eventType: '$eventType' },
           count: { $sum: 1 },
         },
-      },
+      } as PipelineStage,
       {
         $group: {
           _id: '$_id.variant',
           events: { $push: { eventType: '$_id.eventType', count: '$count' } },
           total: { $sum: '$count' },
         },
-      },
-      { $sort: { _id: 1 } }
+      } as PipelineStage,
+      { $sort: { _id: 1 } } as PipelineStage
     );
 
     const results = await AnalyticsEvent.aggregate(pipeline);
