@@ -172,7 +172,7 @@ npm run create-admin
 
 3. Sprawdź porty:
    ```bash
-   sudo netstat -tulpn | grep -E '3000|5003'
+   sudo netstat -tulpn | grep -E '3000|5005'
    ```
 
 ### Certyfikaty SSL

@@ -239,7 +239,7 @@ sudo tee -a /etc/nginx/sites-available/api.styroaction.pl > /dev/null <<EOF
     add_header Access-Control-Allow-Headers "*" always;
 
     location / {
-        proxy_pass http://localhost:5003;
+        proxy_pass http://localhost:5005;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;

@@ -30,7 +30,7 @@ npm run install:all
 
 Backend (`server/.env`):
 ```
-PORT=5003
+PORT=5005
 MONGODB_URI=mongodb+srv://softsynerg_db_user:akcDa1BKaxY2NZpd@cluster0.gihj3kc.mongodb.net/styrtoaction?retryWrites=true&w=majority&appName=Cluster0
 JWT_SECRET=your-secret-key-change-in-production
 SMTP_HOST=smtp.gmail.com
@@ -43,7 +43,7 @@ SMTP_FROM=your-email@gmail.com
 
 Frontend (`client/.env.local`):
 ```
-NEXT_PUBLIC_API_URL=http://localhost:5003/api
+NEXT_PUBLIC_API_URL=http://localhost:5005/api
 ```
 
 3. Uruchom MongoDB (lub użyj MongoDB Atlas)

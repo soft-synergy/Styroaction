@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5003/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
 const USE_CASES = [
   { value: 'floor-heated', label: 'Podłoga ogrzewana (podłogowy)' },

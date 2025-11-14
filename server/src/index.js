@@ -11,7 +11,7 @@ var prices_1 = require("./routes/prices");
 var admin_1 = require("./routes/admin");
 dotenv_1.default.config();
 var app = (0, express_1.default)();
-var PORT = process.env.PORT || 5003;
+var PORT = process.env.PORT || 5005;
 // Middleware
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());

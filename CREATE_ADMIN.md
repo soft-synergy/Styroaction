@@ -6,7 +6,7 @@
 
 ```bash
 MONGODB_URI=mongodb+srv://softsynerg_db_user:akcDa1BKaxY2NZpd@cluster0.gihj3kc.mongodb.net/styrtoaction?retryWrites=true&w=majority&appName=Cluster0
-PORT=5003
+PORT=5005
 JWT_SECRET=styrtoaction-secret-key-change-in-production
 ```
 
@@ -29,7 +29,7 @@ npm run dev
 2. **Wykonaj request** (w osobnym terminalu):
 
 ```bash
-curl -X POST http://localhost:5003/api/admin/register \
+curl -X POST http://localhost:5005/api/admin/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
@@ -86,7 +86,7 @@ curl -X POST http://localhost:5003/api/admin/register \
 Po utworzeniu admina możesz przetestować logowanie:
 
 ```bash
-curl -X POST http://localhost:5003/api/admin/login \
+curl -X POST http://localhost:5005/api/admin/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",

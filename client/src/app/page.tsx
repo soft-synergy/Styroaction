@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import RequestForm from '@/components/RequestForm';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5003/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
 interface StyrofoamType {
   _id: string;
