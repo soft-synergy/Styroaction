@@ -14,18 +14,27 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5005;
 
-// Middleware
-app.use(cors({ origin: true }));
+// Middleware - CORS całkowicie otwarte
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  credentials: false,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+
 app.use(express.json());
 
-// Global CORS headers - allow everything
+// Dodatkowe CORS headers dla pewności
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'false');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.header('Access-Control-Allow-Credentials', 'false');
 
   if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Max-Age', '3600');
     return res.sendStatus(204);
   }
 

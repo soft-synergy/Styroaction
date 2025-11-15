@@ -233,18 +233,35 @@ sudo tee -a /etc/nginx/sites-available/api.styroaction.pl > /dev/null <<EOF
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # CORS headers - allow all
+    # CORS headers - allow all (dodajemy always żeby działało dla wszystkich statusów)
     add_header Access-Control-Allow-Origin "*" always;
     add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
-    add_header Access-Control-Allow-Headers "*" always;
+    add_header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin" always;
+    add_header Access-Control-Allow-Credentials "false" always;
 
+    # Obsługa preflight OPTIONS requests
     location / {
+        if (\$request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin "*" always;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin" always;
+            add_header Access-Control-Max-Age "3600" always;
+            add_header Content-Type "text/plain charset=UTF-8" always;
+            add_header Content-Length "0" always;
+            return 204;
+        }
+
         proxy_pass http://localhost:5005;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
     }
 }
 EOF
