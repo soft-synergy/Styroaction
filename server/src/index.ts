@@ -14,11 +14,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5005;
 
-// Middleware - CORS całkowicie otwarte
+// Middleware - CORS całkowicie wyłączone (allow all)
+// Używamy najprostszej konfiguracji która działa w dev i prod
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  origin: true, // Pozwala na wszystkie originy
+  methods: '*', // Wszystkie metody
+  allowedHeaders: '*', // Wszystkie nagłówki
   credentials: false,
   preflightContinue: false,
   optionsSuccessStatus: 204
@@ -26,16 +27,19 @@ app.use(cors({
 
 app.use(express.json());
 
-// Dodatkowe CORS headers dla pewności
+// Dodatkowe CORS headers - zawsze dodajemy dla każdego requestu
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-  res.header('Access-Control-Allow-Credentials', 'false');
+  // Ustaw wszystkie CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Allow-Credentials', 'false');
+  res.setHeader('Access-Control-Expose-Headers', '*');
 
+  // Obsługa preflight OPTIONS
   if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Max-Age', '3600');
-    return res.sendStatus(204);
+    res.setHeader('Access-Control-Max-Age', '86400'); // 24h cache
+    return res.status(204).end();
   }
 
   next();
