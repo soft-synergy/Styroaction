@@ -19,11 +19,11 @@ import {
   Mail,
   Phone,
   MapPin,
-  Building2,
   Sparkles,
   DollarSign,
 } from 'lucide-react';
 import RequestForm from '@/components/RequestForm';
+import { trackGAEvent, trackPageView } from '@/lib/analytics';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
@@ -475,9 +475,15 @@ function HomeContent() {
     }
   };
 
+  const trackGA = (action: string, category: string = 'engagement', label?: string) => {
+    trackGAEvent(action, category, label ? `${label} (variant: ${variant})` : `variant: ${variant}`);
+  };
+
   useEffect(() => {
-    if (variant && !hasTrackedView) {
+    if (variant && !hasTrackedView && typeof window !== 'undefined') {
       trackEvent('page_view');
+      trackPageView(window.location.pathname, `Landing Page - Variant ${variant}`);
+      trackGA('page_view', 'page', `variant_${variant}`);
       setHasTrackedView(true);
     }
   }, [variant, hasTrackedView]);
@@ -502,6 +508,7 @@ function HomeContent() {
         if (timeOnPage > 10000) {
           setShowExitIntent(true);
           sessionStorage.setItem('exitIntentShown', 'true');
+          trackGA('exit_intent_shown', 'engagement', `time_on_page_${Math.round(timeOnPage / 1000)}s`);
         }
       }
     };
@@ -533,6 +540,7 @@ function HomeContent() {
         if (scrollPercentage > 80 && timeOnPage > 30000 && !openDialog && !submitted && !showScrollPopup) {
           setShowScrollPopup(true);
           localStorage.setItem('scrollPopupShown', 'true');
+          trackGA('scroll_popup_shown', 'engagement', `scroll_${Math.round(scrollPercentage)}%_time_${Math.round(timeOnPage / 1000)}s`);
         }
       }, 500); // Debounce
     };
@@ -548,6 +556,7 @@ function HomeContent() {
     if (!openDialog) {
       setOpenDialog(true);
       trackEvent('open_modal');
+      trackGA('open_modal', 'conversion', 'form_modal_opened');
     }
   };
 
@@ -558,6 +567,7 @@ function HomeContent() {
   const handleAcceptCookies = () => {
     localStorage.setItem('cookieConsent', 'accepted');
     setShowCookieConsent(false);
+    trackGA('cookie_consent_accepted', 'engagement', 'cookies_accepted');
   };
 
   return (
@@ -593,13 +603,21 @@ function HomeContent() {
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm">
           <div className="flex items-center gap-2">
             <Phone className="h-4 w-4" />
-            <a href="tel:+48576205389" className="hover:underline font-semibold">
+            <a 
+              href="tel:+48576205389" 
+              className="hover:underline font-semibold"
+              onClick={() => trackGA('contact_click', 'engagement', 'phone_click')}
+            >
               +48 576 205 389
             </a>
           </div>
           <div className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
-            <a href="mailto:info@soft-synergy.com" className="hover:underline font-semibold">
+            <a 
+              href="mailto:info@soft-synergy.com" 
+              className="hover:underline font-semibold"
+              onClick={() => trackGA('contact_click', 'engagement', 'email_click')}
+            >
               info@styroaction.pl
             </a>
           </div>
@@ -707,9 +725,11 @@ function HomeContent() {
       <nav className="sticky top-0 z-50 w-full border-b-2 bg-white shadow-sm">
         <div className="container flex h-20 items-center justify-between px-4">
           <div className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white">
-              <Building2 className="h-6 w-6" />
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Styrtoaction.pl Logo" 
+              className="h-12 w-12 object-contain"
+            />
             <span className="text-2xl font-bold">Styrtoaction.pl</span>
           </div>
           <Button size="lg" className="text-lg px-8 py-6 h-auto bg-blue-600 hover:bg-blue-700" onClick={handleOpenModal}>
@@ -1020,7 +1040,11 @@ function HomeContent() {
           <div className="grid gap-8 md:grid-cols-3 text-center md:text-left">
             <div>
               <div className="mb-4 flex items-center justify-center md:justify-start space-x-2">
-                <Building2 className="h-6 w-6" />
+                <img 
+                  src="/logo.png" 
+                  alt="Styrtoaction.pl Logo" 
+                  className="h-8 w-8 object-contain"
+                />
                 <span className="text-xl font-bold">Styrtoaction.pl</span>
               </div>
               <p className="text-gray-400">
@@ -1032,13 +1056,21 @@ function HomeContent() {
               <ul className="space-y-2 text-gray-400">
                 <li className="flex items-center justify-center md:justify-start gap-2">
                   <Mail className="h-5 w-5" />
-                  <a href="mailto:info@soft-synergy.com" className="hover:text-white">
+                  <a 
+                    href="mailto:info@soft-synergy.com" 
+                    className="hover:text-white"
+                    onClick={() => trackGA('contact_click', 'engagement', 'email_click_footer')}
+                  >
                     info@styroaction.pl
                   </a>
                 </li>
                 <li className="flex items-center justify-center md:justify-start gap-2">
                   <Phone className="h-5 w-5" />
-                  <a href="tel:+48576205389" className="hover:text-white">
+                  <a 
+                    href="tel:+48576205389" 
+                    className="hover:text-white"
+                    onClick={() => trackGA('contact_click', 'engagement', 'phone_click_footer')}
+                  >
                     +48 576 205 389
                   </a>
                 </li>

@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { trackGAEvent } from '@/lib/analytics';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
 
@@ -168,6 +169,10 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
     }
   };
 
+  const trackGA = (action: string, category: string = 'conversion', label?: string) => {
+    trackGAEvent(action, category, label ? `${label} (variant: ${variant})` : `variant: ${variant}`);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -236,6 +241,16 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
 
       await axios.post(`${API_URL}/requests`, requestPayload);
       await trackAnalytics('submit_form');
+      
+      // Track GA event with form details
+      const formDetails = {
+        mode: requestMode,
+        itemsCount: requestMode === 'guided' ? (preparedGuidedItems?.length || 0) : 0,
+        hasVolume: totalVolume > 0,
+        totalVolume: totalVolume > 0 ? Math.round(totalVolume) : 0,
+      };
+      trackGA('submit_form', 'conversion', JSON.stringify(formDetails));
+      
       onSubmit();
     } catch (err: any) {
       const message =
@@ -263,7 +278,11 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
             <Button
               type="button"
               variant={requestMode === 'guided' ? 'default' : 'outline'}
-              onClick={() => setRequestMode('guided')}
+              onClick={() => {
+                setRequestMode('guided');
+                trackGA('form_mode_selected', 'conversion', 'guided_mode');
+                trackGA('form_started', 'conversion', 'form_interaction_started');
+              }}
               className={`h-auto py-6 text-lg ${
                 requestMode === 'guided'
                   ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600'
@@ -280,7 +299,11 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
             <Button
               type="button"
               variant={requestMode === 'manual' ? 'default' : 'outline'}
-              onClick={() => setRequestMode('manual')}
+              onClick={() => {
+                setRequestMode('manual');
+                trackGA('form_mode_selected', 'conversion', 'manual_mode');
+                trackGA('form_started', 'conversion', 'form_interaction_started');
+              }}
               className={`h-auto py-6 text-lg ${
                 requestMode === 'manual'
                   ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600'
