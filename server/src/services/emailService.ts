@@ -321,7 +321,7 @@ export const sendRequestConfirmationEmail = async (requestIdOrDoc: string | (IRe
           <div style="max-width: 640px; margin: 0 auto; padding: 32px 16px;">
             <div style="background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 50px rgba(12,61,91,0.08); border: 1px solid #e2ecf3;">
               <div style="background: linear-gradient(135deg, #0c3d5b, #108fdc); padding: 32px;">
-                <img src="https://styroaction.pl/logo-styroaction.png" alt="Styroaction" style="width: 180px; display: block; margin-bottom: 24px;" />
+                <img src="https://styroaction.pl/logo.png" alt="Styroaction" style="width: 180px; height: auto; display: block; margin-bottom: 24px;" />
                 <p style="color: rgba(255,255,255,0.85); letter-spacing: 0.2em; text-transform: uppercase; font-size: 13px; margin: 0 0 8px;">Potwierdzenie zgłoszenia</p>
                 <h1 style="color: #fff; font-size: 32px; margin: 0;">Dziękujemy za zaufanie!</h1>
               </div>

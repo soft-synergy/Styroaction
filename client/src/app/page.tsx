@@ -416,6 +416,7 @@ function HomeContent() {
   const [hasTrackedView, setHasTrackedView] = useState(false);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [showScrollPopup, setShowScrollPopup] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [userCount] = useState(Math.floor(Math.random() * 50) + 120);
   const [showCookieConsent, setShowCookieConsent] = useState(false);
@@ -791,10 +792,47 @@ function HomeContent() {
               onSubmit={() => {
                 setSubmitted(true);
                 setOpenDialog(false);
+                setShowSuccessModal(true);
               }}
               onCancel={() => setOpenDialog(false)}
             />
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-lg p-8">
+          <DialogHeader className="text-center space-y-4">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-500">
+              <CheckCircle2 className="h-10 w-10 text-white" />
+            </div>
+            <DialogTitle className="text-3xl font-bold text-green-900">
+              Dziękujemy za zgłoszenie!
+            </DialogTitle>
+            <DialogDescription className="text-lg text-green-800 leading-relaxed">
+              Wysłaliśmy potwierdzenie na Twój email i zbieramy właśnie wyceny od fabryk. Konsultant Antoni Seba
+              odezwie się, gdy tylko zestawimy najlepsze oferty.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-6 space-y-3 text-gray-700 text-base">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-500 mt-1" />
+              <p>Średni czas przygotowania ofert: 2–6 godzin roboczych.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-500 mt-1" />
+              <p>Jeśli masz dodatkowe informacje, odpowiedz na maila potwierdzającego lub zadzwoń pod +48 576 205 389.</p>
+            </div>
+          </div>
+          <DialogFooter className="pt-6">
+            <Button
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+              onClick={() => setShowSuccessModal(false)}
+            >
+              Zamknij i wróć na stronę
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -1225,32 +1263,6 @@ function HomeContent() {
                   <span>Bez spamu</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Success Message */}
-      {submitted && (
-        <section
-          className="animate-section py-16 md:py-24 bg-green-50"
-          ref={registerAnimatedElement}
-        >
-          <div className="container px-4">
-            <div className="animate-section max-w-2xl mx-auto" ref={registerAnimatedElement}>
-              <Card className="card-hover border-4 border-green-500 bg-white">
-                <CardHeader className="text-center">
-                  <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-500">
-                    <CheckCircle2 className="h-12 w-12 text-white" />
-                  </div>
-                  <CardTitle className="text-3xl md:text-4xl text-green-900 font-bold">
-                    Dziękujemy!
-                  </CardTitle>
-                  <CardDescription className="text-xl text-green-800 mt-4">
-                    Otrzymaliśmy Twoje zapytanie. Wyślemy Ci ceny na email w ciągu kilku godzin.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
             </div>
           </div>
         </section>
