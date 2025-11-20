@@ -25,7 +25,7 @@ import {
 import RequestForm from '@/components/RequestForm';
 import { trackGAEvent, trackPageView } from '@/lib/analytics';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.styroaction.pl/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.styroaction.pl/api';
 
 interface StyrofoamType {
   _id: string;

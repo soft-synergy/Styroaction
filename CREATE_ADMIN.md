@@ -29,7 +29,7 @@ npm run dev
 2. **Wykonaj request** (w osobnym terminalu):
 
 ```bash
-curl -X POST http://api.styroaction.pl/api/admin/register \
+curl -X POST https://api.styroaction.pl/api/admin/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
@@ -86,7 +86,7 @@ curl -X POST http://api.styroaction.pl/api/admin/register \
 Po utworzeniu admina możesz przetestować logowanie:
 
 ```bash
-curl -X POST http://api.styroaction.pl/api/admin/login \
+curl -X POST https://api.styroaction.pl/api/admin/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",

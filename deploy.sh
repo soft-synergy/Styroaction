@@ -251,7 +251,7 @@ sudo tee -a /etc/nginx/sites-available/api.styroaction.pl > /dev/null <<EOF
             return 204;
         }
 
-        proxy_pass http://api.styroaction.pl;
+        proxy_pass https://api.styroaction.pl;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Manager.module.css';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.styroaction.pl/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.styroaction.pl/api';
 
 interface Price {
   _id: string;

@@ -44,7 +44,7 @@ SMTP_FROM=your-email@gmail.com
 
 Frontend (`client/.env.local`):
 ```
-NEXT_PUBLIC_API_URL=http://api.styroaction.pl/api
+NEXT_PUBLIC_API_URL=https://api.styroaction.pl/api
 ```
 
 3. Uruchom MongoDB (lub użyj MongoDB Atlas)

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { trackGAEvent } from '@/lib/analytics';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.styroaction.pl/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.styroaction.pl/api';
 
 const USE_CASES = [
   { value: 'floor-heated', label: 'Podłoga ogrzewana (podłogowy)' },
