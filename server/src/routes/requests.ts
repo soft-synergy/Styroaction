@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import RequestModel from '../models/Request';
-import { sendPriceBreakdown } from '../services/emailService';
+import { sendPriceBreakdown, sendRequestConfirmationEmail } from '../services/emailService';
 
 const router = express.Router();
 
@@ -53,6 +53,11 @@ router.post('/', async (req: Request, res: Response) => {
       { path: 'guidedItems.styrofoamType' },
     ]);
 
+    // Send confirmation email (non-blocking for API response)
+    sendRequestConfirmationEmail(savedRequest).catch((emailError) => {
+      console.error('Failed to send confirmation email:', emailError);
+    });
+
     res.status(201).json(savedRequest);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -104,6 +109,21 @@ router.patch('/:id', async (req: Request, res: Response) => {
     }
 
     res.json(request);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete request
+router.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    const deletedRequest = await RequestModel.findByIdAndDelete(req.params.id);
+
+    if (!deletedRequest) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+
+    res.json({ message: 'Request deleted successfully' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

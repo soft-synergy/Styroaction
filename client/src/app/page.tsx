@@ -685,7 +685,7 @@ function HomeContent() {
               className="hover:underline font-semibold"
               onClick={() => trackGA('contact_click', 'engagement', 'phone_click')}
             >
-              +48 576 205 333
+              +48 576 205 389
             </a>
           </div>
           <div className="flex items-center gap-2">
@@ -1296,7 +1296,7 @@ function HomeContent() {
                     className="hover:text-white"
                     onClick={() => trackGA('contact_click', 'engagement', 'phone_click_footer')}
                   >
-                    +48 576 205 333
+                    +48 576 205 389
                   </a>
                 </li>
               </ul>

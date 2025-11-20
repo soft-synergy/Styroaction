@@ -45,6 +45,7 @@ export default function RequestsManager({ token }: RequestsManagerProps) {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -76,6 +77,21 @@ export default function RequestsManager({ token }: RequestsManagerProps) {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('pl-PL');
+  };
+
+  const deleteRequest = async (requestId: string) => {
+    const confirmed = window.confirm('Na pewno usunąć to zapytanie? Tej operacji nie można cofnąć.');
+    if (!confirmed) return;
+
+    setDeletingId(requestId);
+    try {
+      await axios.delete(`${API_URL}/requests/${requestId}`);
+      setRequests((prev) => prev.filter((request) => request._id !== requestId));
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Nie udało się usunąć zapytania');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -206,6 +222,14 @@ export default function RequestsManager({ token }: RequestsManagerProps) {
                       {processingId === request._id ? 'Wysyłanie...' : 'Wyślij email'}
                     </button>
                   )}
+                  <button
+                    onClick={() => deleteRequest(request._id)}
+                    disabled={deletingId === request._id}
+                    className={styles.deleteButton}
+                    style={{ opacity: deletingId === request._id ? 0.7 : 1, marginTop: 8 }}
+                  >
+                    {deletingId === request._id ? 'Usuwanie...' : 'Usuń'}
+                  </button>
                   {request.emailSentAt && (
                     <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
                       Wysłano: {formatDate(request.emailSentAt)}
