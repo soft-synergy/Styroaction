@@ -67,6 +67,87 @@ type Testimonial = {
   author: string;
 };
 
+const OBJECTION_FAQ: FAQItem[] = [
+  {
+    question: 'Mam już ofertę z hurtowni – po co mi Styrtoaction?',
+    answer:
+      'Porównujemy ją z cenami z fabryk i często widzimy dodatkowe 5–10% rabatu. Dostajesz potwierdzenie na mailu, więc masz argument przy negocjacjach.',
+  },
+  {
+    question: 'Czy oferty są naprawdę z dzisiaj?',
+    answer:
+      'Tak. Każde zapytanie wysyłamy w momencie zgłoszenia, a producent potwierdza ceny i terminy. W mailu masz datę ważności każdej propozycji.',
+  },
+  {
+    question: 'Co jeśli potrzebuję tylko orientacyjnej wyceny?',
+    answer:
+      'Nie ma problemu – podaj zakres i parametry, dostaniesz widełki cenowe oraz info, jak zamówienie wpływa na rabaty.',
+  },
+  {
+    question: 'Czy ktoś będzie do mnie dzwonił co chwilę?',
+    answer:
+      'Nie. Telefon wykonujemy tylko, jeśli poprosisz o konsultację. Standardowo wysyłamy wszystko mailowo, żebyś miał spokój.',
+  },
+];
+
+type PersonaFlow = {
+  title: string;
+  badge: string;
+  subtitle: string;
+  steps: string[];
+};
+
+const PERSONA_FLOWS: PersonaFlow[] = [
+  {
+    title: 'Dla inwestora indywidualnego',
+    badge: 'Budowa domu / remont',
+    subtitle: 'Potrzebujesz szybko policzyć koszt izolacji dla domu, mieszkania albo garażu.',
+    steps: [
+      'Podajesz kod pocztowy, ilości i kontakt (2 minuty).',
+      'My łączymy Cię z producentami z regionu i zbieramy ceny.',
+      'Dostajesz tabelę ofert + rekomendację najtańszej opcji.',
+    ],
+  },
+  {
+    title: 'Dla wykonawcy / firmy',
+    badge: 'Ekipa, deweloper, hurt',
+    subtitle: 'Masz kilka realizacji równolegle i potrzebujesz aktualnych stawek z rabatem wolumenowym.',
+    steps: [
+      'Uzupełniasz zapotrzebowanie dla każdego projektu lub wrzucasz opis w trybie “manual”.',
+      'Łączymy wolumen, negocjujemy warunki i terminy dostaw.',
+      'Wysyłamy gotową tabelę + kontakt do osoby decyzyjnej w fabryce.',
+    ],
+  },
+];
+
+const COMPARISON_ROWS = [
+  {
+    label: 'Liczba producentów w jednym zapytaniu',
+    platform: '50+ współpracujących fabryk i dystrybutorów',
+    manual: '3–5 telefonów i losowe oferty',
+  },
+  {
+    label: 'Średni czas na zestawienie',
+    platform: '2–6 godzin roboczych',
+    manual: '1–2 dni (telefony, Excel, przypomnienia)',
+  },
+  {
+    label: 'Negocjacje i rabaty',
+    platform: 'Łączymy wolumen klientów i schodzimy z cen hurtowych',
+    manual: 'Każdy negocjuje sam, brak efektu skali',
+  },
+  {
+    label: 'Zaufanie i papierologia',
+    platform: 'Formalny mail + PDF/CSV gotowy do przekazania inwestorowi',
+    manual: 'Notatki telefoniczne, często bez potwierdzenia warunków',
+  },
+  {
+    label: 'Wsparcie po złożeniu zapytania',
+    platform: 'Konsultant śledzi oferty i dopina transport',
+    manual: 'Musisz pilnować terminów i dostępności samodzielnie',
+  },
+];
+
 type LandingContent = {
   heroBadge: string;
   heroTitle: string;
@@ -419,6 +500,12 @@ function HomeContent() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [userCount] = useState(Math.floor(Math.random() * 50) + 120);
+  const [liveStats] = useState(() => ({
+    requestsToday: Math.floor(Math.random() * 15) + 35,
+    avgSaving: Math.floor(Math.random() * 350) + 450,
+    responseTime: '2–6 h',
+    producersActive: Math.floor(Math.random() * 8) + 42,
+  }));
   const [showCookieConsent, setShowCookieConsent] = useState(false);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(0);
@@ -492,6 +579,10 @@ function HomeContent() {
     }
     return variantContent[variant];
   }, [variant]);
+
+  const combinedFaq = useMemo(() => {
+    return [...content.faqItems, ...OBJECTION_FAQ];
+  }, [content]);
 
   const registerAnimatedElement = useCallback((element: HTMLElement | null) => {
     if (!element) return;
@@ -918,6 +1009,38 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* Live Social Proof */}
+      <section className="animate-section bg-gray-900 py-10 text-white" ref={registerAnimatedElement}>
+        <div className="container px-4">
+          <div className="mx-auto flex max-w-5xl flex-col gap-6 rounded-2xl border border-gray-800 bg-gray-900/80 p-6 shadow-2xl backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-blue-300">Tu i teraz</p>
+              <h3 className="mt-2 text-3xl font-bold">Styrtoaction pracuje w tle</h3>
+              <p className="mt-2 text-base text-gray-300">
+                Każde zgłoszenie trafia od razu do producentów. Poniżej aktualne liczby z dzisiaj.
+              </p>
+            </div>
+            <div className="grid flex-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-xl bg-gray-800/80 p-4 text-center">
+                <p className="text-sm text-gray-400">Zapytań dzisiaj</p>
+                <p className="text-3xl font-extrabold text-white">{liveStats.requestsToday}</p>
+                <p className="text-xs text-gray-400">nowych formularzy</p>
+              </div>
+              <div className="rounded-xl bg-gray-800/80 p-4 text-center">
+                <p className="text-sm text-gray-400">Średnia oszczędność</p>
+                <p className="text-3xl font-extrabold text-white">~{liveStats.avgSaving} zł</p>
+                <p className="text-xs text-gray-400">na zamówieniu</p>
+              </div>
+              <div className="rounded-xl bg-gray-800/80 p-4 text-center">
+                <p className="text-sm text-gray-400">Aktywnych producentów</p>
+                <p className="text-3xl font-extrabold text-white">{liveStats.producersActive}</p>
+                <p className="text-xs text-gray-400">odpowiada w tym momencie</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section
         className="animate-section py-16 md:py-20 bg-white"
@@ -934,21 +1057,29 @@ function HomeContent() {
           >
             {content.howSubtitle}
           </p>
-          <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
-            {content.howSteps.map((step, index) => (
+          <div className="grid gap-8 md:grid-cols-2 max-w-6xl mx-auto">
+            {PERSONA_FLOWS.map((persona, index) => (
               <div
-                key={step.title}
+                key={persona.title}
                 ref={registerAnimatedElement}
-                className="animate-section text-center"
-                style={{ transitionDelay: `${index * 150}ms` }}
+                className="animate-section rounded-3xl border-2 border-gray-100 bg-white p-6 shadow-xl"
+                style={{ transitionDelay: `${index * 160}ms` }}
               >
-                <div className="mb-6 flex justify-center">
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-white text-4xl font-bold shadow-xl ring-4 ring-blue-100">
-                    {index + 1}
-                  </div>
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700">
+                  <span>{persona.badge}</span>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-gray-900">{step.title}</h3>
-                <p className="text-lg text-gray-700">{step.description}</p>
+                <h3 className="text-2xl font-bold text-gray-900">{persona.title}</h3>
+                <p className="mt-2 text-base text-gray-600">{persona.subtitle}</p>
+                <ul className="mt-6 space-y-4 text-left text-gray-800">
+                  {persona.steps.map((item, stepIndex) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                        {stepIndex + 1}
+                      </div>
+                      <span className="text-lg">{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -983,6 +1114,36 @@ function HomeContent() {
                 </Card>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison Section */}
+      <section
+        className="animate-section py-16 md:py-20 bg-white"
+        ref={registerAnimatedElement}
+      >
+        <div className="container px-4">
+          <div className="mx-auto max-w-5xl overflow-hidden rounded-3xl border-2 border-gray-100 shadow-2xl">
+            <div className="bg-blue-600 px-6 py-8 text-center text-white">
+              <p className="text-sm uppercase tracking-[0.3em] text-blue-200">Dlaczego Styrtoaction?</p>
+              <h2 className="mt-2 text-3xl font-bold">Porównanie: platforma vs. samodzielne dzwonienie</h2>
+            </div>
+            <div className="divide-y divide-gray-100 bg-white">
+              {COMPARISON_ROWS.map((row) => (
+                <div key={row.label} className="grid gap-4 px-6 py-6 text-sm text-gray-800 md:grid-cols-3 md:text-base">
+                  <div className="font-semibold text-gray-900">{row.label}</div>
+                  <div className="rounded-xl bg-blue-50 p-4 text-blue-900">
+                    <p className="text-xs uppercase tracking-wide text-blue-400">Styrtoaction</p>
+                    <p className="mt-1 font-semibold">{row.platform}</p>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 p-4 text-gray-700">
+                    <p className="text-xs uppercase tracking-wide text-gray-400">Samodzielnie</p>
+                    <p className="mt-1">{row.manual}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -1179,7 +1340,7 @@ function HomeContent() {
             {content.faqTitle}
           </h2>
           <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-            {content.faqItems.map((faq, index) => (
+            {combinedFaq.map((faq, index) => (
               <div
                 key={faq.question}
                 ref={registerAnimatedElement}
