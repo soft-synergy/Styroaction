@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 import PriceModel from '../models/Price';
 import RequestModel, { IRequest } from '../models/Request';
+
+dotenv.config();
 
 const resolveEnv = (key: string) => {
   const value = process.env[key];
@@ -13,11 +16,11 @@ const resolveEnv = (key: string) => {
 const SMTP_CONFIG = {
   host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
   port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
     user: resolveEnv('SMTP_USER'),
     pass: resolveEnv('SMTP_PASS'),
-  },
+    },
 };
 
 const SENDER_NAME = process.env.SMTP_SENDER_NAME || 'Styroaction - giełda styropianu';
@@ -219,7 +222,7 @@ export const sendPriceBreakdown = async (requestId: string): Promise<boolean> =>
         </body>
       </html>
     `;
-
+    
     await transporter.sendMail({
       from: SENDER_ADDRESS,
       to: req.email,
