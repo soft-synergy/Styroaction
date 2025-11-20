@@ -1316,8 +1316,8 @@ function HomeContent() {
             <div>
               <h4 className="mb-4 font-bold text-lg">Informacje</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Regulamin</a></li>
-                <li><a href="#" className="hover:text-white">Polityka prywatności</a></li>
+                <li><a href="/regulamin" className="hover:text-white">Regulamin</a></li>
+                <li><a href="/polityka-prywatnosci" className="hover:text-white">Polityka prywatności</a></li>
               </ul>
             </div>
           </div>
