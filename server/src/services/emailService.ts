@@ -24,7 +24,7 @@ const SMTP_CONFIG = {
 };
 
 const SENDER_NAME = process.env.SMTP_SENDER_NAME || 'Styroaction - giełda styropianu';
-const SENDER_ADDRESS = `${SENDER_NAME} <${SMTP_CONFIG.auth.user}>`;
+const SENDER_ADDRESS = `${SENDER_NAME} <development@soft-synergy.com>`;
 
 const transporter = nodemailer.createTransport(SMTP_CONFIG);
 
