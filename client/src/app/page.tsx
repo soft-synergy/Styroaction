@@ -419,6 +419,8 @@ function HomeContent() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [userCount] = useState(Math.floor(Math.random() * 50) + 120);
   const [showCookieConsent, setShowCookieConsent] = useState(false);
+  const [isMobileLayout, setIsMobileLayout] = useState(false);
+  const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(0);
   const animatedElementsRef = useRef<HTMLElement[]>([]);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const searchParams = useSearchParams();
@@ -457,6 +459,31 @@ function HomeContent() {
     localStorage.setItem('landingVariant', randomVariant);
     setVariant(randomVariant);
   }, [searchParams]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobileLayout(event.matches);
+    };
+
+    setIsMobileLayout(mediaQuery.matches);
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+    } else {
+      mediaQuery.addListener(handleChange);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange);
+      } else {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
+  }, []);
 
   const content = useMemo(() => {
     if (!variant) {
@@ -509,6 +536,8 @@ function HomeContent() {
 
   // Exit intent detection - tylko raz na sesję
   useEffect(() => {
+    if (isMobileLayout) return;
+
     const exitIntentShown = sessionStorage.getItem('exitIntentShown');
     if (exitIntentShown === 'true') return;
 
@@ -527,7 +556,7 @@ function HomeContent() {
     (window as any).pageLoadTime = Date.now();
     document.addEventListener('mouseleave', handleMouseLeave);
     return () => document.removeEventListener('mouseleave', handleMouseLeave);
-  }, [openDialog, submitted, showExitIntent]);
+  }, [openDialog, submitted, showExitIntent, isMobileLayout]);
 
   // Scroll-based popup - tylko raz, po większym scrollu i czasie
   useEffect(() => {
@@ -604,6 +633,12 @@ function HomeContent() {
     setShowCookieConsent(false);
     trackGA('cookie_consent_accepted', 'engagement', 'cookies_accepted');
   };
+
+  const quickStats = [
+    { label: 'Producentów w bazie', value: '50+' },
+    { label: 'Średnia oszczędność', value: '700 zł' },
+    { label: 'Czas odpowiedzi', value: '2-6 h' },
+  ];
 
   return (
     <div className="min-h-screen bg-white text-gray-900">

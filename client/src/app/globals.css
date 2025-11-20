@@ -62,7 +62,7 @@
   .animate-section {
     opacity: 0;
     transform: translateY(24px) scale(0.98);
-    transition: opacity 0.9s ease, transform 0.9s ease;
+    transition: opacity 0.55s ease-out, transform 0.55s ease-out;
     will-change: opacity, transform;
   }
 
