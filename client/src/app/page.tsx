@@ -838,7 +838,7 @@ function HomeContent() {
 
       {/* Navigation */}
       <nav className="sticky top-0 z-50 w-full border-b-2 bg-white shadow-sm">
-        <div className="container flex h-20 items-center justify-between px-4">
+        <div className="container flex flex-col gap-3 px-4 py-3 sm:h-20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-3">
             <img 
               src="/logo.png" 
@@ -849,7 +849,7 @@ function HomeContent() {
           </div>
           <Button
             size="lg"
-            className="text-base px-6 py-3 h-12 rounded-full bg-blue-600 hover:bg-blue-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"
+            className="w-full text-base px-6 py-3 h-12 rounded-full bg-blue-600 hover:bg-blue-700 shadow-md transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"
             onClick={handleOpenModal}
           >
             {content.heroButton}
@@ -1321,9 +1321,20 @@ function HomeContent() {
               </ul>
             </div>
           </div>
-          <div className="mt-8 border-t border-gray-800 pt-8 text-center text-gray-400">
+          <div className="mt-8 border-t border-gray-800 pt-8 text-center text-gray-400 space-y-2">
             <p>&copy; 2024 Styrtoaction.pl</p>
-            <p className="text-xs mt-2">Wersja landing page: {variant}</p>
+            <p className="text-xs">Wersja landing page: {variant}</p>
+            <p className="text-xs">
+              Systemy informatyczne wspierane przez{' '}
+              <a
+                href="https://soft-synergy.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-white underline decoration-dotted decoration-1 underline-offset-2 hover:text-blue-200"
+              >
+                Soft Synergy
+              </a>
+            </p>
           </div>
         </div>
       </footer>

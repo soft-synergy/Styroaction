@@ -5,6 +5,7 @@ import ProducersManager from './ProducersManager';
 import StyrofoamTypesManager from './StyrofoamTypesManager';
 import PricesManager from './PricesManager';
 import RequestsManager from './RequestsManager';
+import AnalyticsManager from './AnalyticsManager';
 import styles from './AdminDashboard.module.css';
 
 interface AdminDashboardProps {
@@ -12,7 +13,7 @@ interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type Tab = 'requests' | 'producers' | 'types' | 'prices';
+type Tab = 'requests' | 'producers' | 'types' | 'prices' | 'analytics';
 
 export default function AdminDashboard({ token, onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('requests');
@@ -51,6 +52,12 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
         >
           Ceny
         </button>
+        <button
+          className={`${styles.navButton} ${activeTab === 'analytics' ? styles.active : ''}`}
+          onClick={() => setActiveTab('analytics')}
+        >
+          Analityka A/B
+        </button>
       </nav>
 
       <main className={styles.content}>
@@ -58,6 +65,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
         {activeTab === 'producers' && <ProducersManager token={token} />}
         {activeTab === 'types' && <StyrofoamTypesManager token={token} />}
         {activeTab === 'prices' && <PricesManager token={token} />}
+        {activeTab === 'analytics' && <AnalyticsManager token={token} />}
       </main>
     </div>
   );
