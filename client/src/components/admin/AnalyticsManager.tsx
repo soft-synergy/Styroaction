@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import styles from './AnalyticsManager.module.css';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.styroaction.pl/api';
 
 interface VariantSummary {
   variant: string;

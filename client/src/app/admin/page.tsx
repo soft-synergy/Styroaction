@@ -6,7 +6,7 @@ import LoginForm from '@/components/admin/LoginForm';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import styles from './admin.module.css';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.styroaction.pl/api';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
