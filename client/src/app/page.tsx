@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
@@ -419,6 +419,8 @@ function HomeContent() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [userCount] = useState(Math.floor(Math.random() * 50) + 120);
   const [showCookieConsent, setShowCookieConsent] = useState(false);
+  const animatedElementsRef = useRef<HTMLElement[]>([]);
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -462,6 +464,15 @@ function HomeContent() {
     }
     return variantContent[variant];
   }, [variant]);
+
+  const registerAnimatedElement = useCallback((element: HTMLElement | null) => {
+    if (!element) return;
+    if (animatedElementsRef.current.includes(element)) return;
+    animatedElementsRef.current.push(element);
+    if (observerRef.current) {
+      observerRef.current.observe(element);
+    }
+  }, []);
 
   const trackEvent = async (eventType: 'page_view' | 'open_modal') => {
     if (!variant) return;
@@ -552,6 +563,30 @@ function HomeContent() {
     };
   }, [openDialog, submitted, showScrollPopup]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10% 0px',
+      }
+    );
+
+    observerRef.current = observer;
+    animatedElementsRef.current.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, []);
+
   const handleOpenModal = () => {
     if (!openDialog) {
       setOpenDialog(true);
@@ -572,6 +607,13 @@ function HomeContent() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
+      <div className="pointer-events-none fixed top-0 left-0 right-0 z-[60] h-1 bg-transparent">
+        <div
+          className="h-full bg-gradient-to-r from-blue-500 via-sky-400 to-green-400 transition-all duration-300 ease-out"
+          style={{ width: `${scrollProgress}%`, opacity: scrollProgress > 1 ? 1 : 0 }}
+          aria-hidden="true"
+        />
+      </div>
       {/* Cookie Consent */}
       {showCookieConsent && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-900 text-white p-4 shadow-lg border-t-2 border-blue-500">
@@ -732,34 +774,68 @@ function HomeContent() {
             />
             <span className="text-2xl font-bold">Styrtoaction.pl</span>
           </div>
-          <Button size="lg" className="text-lg px-8 py-6 h-auto bg-blue-600 hover:bg-blue-700" onClick={handleOpenModal}>
+          <Button
+            size="lg"
+            className="text-base px-6 py-3 h-12 rounded-full bg-blue-600 hover:bg-blue-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"
+            onClick={handleOpenModal}
+          >
             {content.heroButton}
           </Button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-blue-50 to-white py-16 md:py-24">
+      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white py-16 md:py-24">
+        <div className="hero-orb hero-orb--left" aria-hidden="true" />
+        <div className="hero-orb hero-orb--right" aria-hidden="true" />
+        <div className="hero-spotlight" aria-hidden="true" />
         <div className="container px-4">
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-lg font-semibold text-blue-600 shadow-sm">
+          <div className="mx-auto max-w-4xl text-center space-y-8">
+            <div
+              ref={registerAnimatedElement}
+              className="animate-section inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-lg font-semibold text-blue-600 shadow-sm backdrop-blur"
+              style={{ transitionDelay: '100ms' }}
+            >
               <Sparkles className="h-5 w-5" />
               <span>{content.heroBadge}</span>
             </div>
-            <h1 className="mb-6 text-4xl md:text-6xl font-bold leading-tight">
+            <h1
+              ref={registerAnimatedElement}
+              className="animate-section text-4xl md:text-6xl font-bold leading-tight"
+              style={{ transitionDelay: '200ms' }}
+            >
               {content.heroTitle}
             </h1>
-            <p className="mb-10 text-2xl text-gray-700 font-medium">
+            <p
+              ref={registerAnimatedElement}
+              className="animate-section text-2xl text-gray-700 font-medium"
+              style={{ transitionDelay: '300ms' }}
+            >
               {content.heroSubtitle}
             </p>
-            <div className="mb-12">
-              <Button size="lg" className="text-xl px-12 py-8 h-auto bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg" onClick={handleOpenModal}>
+            <div
+              ref={registerAnimatedElement}
+              className="animate-section"
+              style={{ transitionDelay: '400ms' }}
+            >
+              <Button
+                size="lg"
+                className="hero-cta text-xl px-12 py-6 h-auto rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg"
+                onClick={handleOpenModal}
+              >
                 {content.heroButton}
               </Button>
             </div>
-            <div className="flex flex-wrap justify-center gap-8 text-lg text-gray-600">
+            <div
+              ref={registerAnimatedElement}
+              className="animate-section flex flex-wrap justify-center gap-4 text-lg text-gray-600"
+              style={{ transitionDelay: '500ms' }}
+            >
               {content.heroBullets.map((bullet) => (
-                <div key={bullet} className="flex items-center gap-2">
+                <div
+                  key={bullet}
+                  className="flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 shadow-sm backdrop-blur transition-transform duration-300 hover:-translate-y-1"
+                >
                   <CheckCircle2 className="h-6 w-6 text-green-600" />
                   <span>{bullet}</span>
                 </div>
@@ -770,17 +846,31 @@ function HomeContent() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 md:py-20 bg-white">
+      <section
+        className="animate-section py-16 md:py-20 bg-white"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
+          <h2 className="animate-section text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900" ref={registerAnimatedElement}>
             {content.howTitle}
           </h2>
-          <p className="text-lg md:text-xl text-center text-gray-600 mb-12">{content.howSubtitle}</p>
+          <p
+            className="animate-section text-lg md:text-xl text-center text-gray-600 mb-12"
+            ref={registerAnimatedElement}
+            style={{ transitionDelay: '120ms' }}
+          >
+            {content.howSubtitle}
+          </p>
           <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
             {content.howSteps.map((step, index) => (
-              <div key={step.title} className="text-center">
+              <div
+                key={step.title}
+                ref={registerAnimatedElement}
+                className="animate-section text-center"
+                style={{ transitionDelay: `${index * 150}ms` }}
+              >
                 <div className="mb-6 flex justify-center">
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-white text-4xl font-bold shadow-lg">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-white text-4xl font-bold shadow-xl ring-4 ring-blue-100">
                     {index + 1}
                   </div>
                 </div>
@@ -793,76 +883,128 @@ function HomeContent() {
       </section>
 
       {/* Why Section */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      <section
+        className="animate-section py-16 md:py-20 bg-gray-50"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+          <h2
+            className="animate-section text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900"
+            ref={registerAnimatedElement}
+          >
             {content.whyTitle}
           </h2>
           <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-            {content.whyItems.map((item) => (
-              <Card key={item.title} className="border-2 border-gray-200 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">{item.title}</CardTitle>
-                  <CardDescription className="text-lg text-gray-700 mt-2">{item.description}</CardDescription>
-                </CardHeader>
-              </Card>
+            {content.whyItems.map((item, index) => (
+              <div
+                key={item.title}
+                ref={registerAnimatedElement}
+                className="animate-section"
+                style={{ transitionDelay: `${index * 120}ms` }}
+              >
+                <Card className="card-hover border-2 border-gray-200 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-gray-900">{item.title}</CardTitle>
+                    <CardDescription className="text-lg text-gray-700 mt-2">{item.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Value Section */}
-      <section className="py-16 md:py-20 bg-white">
+      <section
+        className="animate-section py-16 md:py-20 bg-white"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
+          <h2
+            className="animate-section text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900"
+            ref={registerAnimatedElement}
+          >
             {content.valueTitle}
           </h2>
-          <p className="text-lg md:text-xl text-center text-gray-600 mb-12">{content.valueSubtitle}</p>
+          <p
+            className="animate-section text-lg md:text-xl text-center text-gray-600 mb-12"
+            ref={registerAnimatedElement}
+          >
+            {content.valueSubtitle}
+          </p>
           <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-            {content.valuePoints.map((point) => (
-              <Card key={point.title} className="border-2 border-gray-200 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">{point.title}</CardTitle>
-                  <CardDescription className="text-lg text-gray-700 mt-2">{point.description}</CardDescription>
-                </CardHeader>
-              </Card>
+            {content.valuePoints.map((point, index) => (
+              <div
+                key={point.title}
+                ref={registerAnimatedElement}
+                className="animate-section"
+                style={{ transitionDelay: `${index * 120}ms` }}
+              >
+                <Card className="card-hover border-2 border-gray-200 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-gray-900">{point.title}</CardTitle>
+                    <CardDescription className="text-lg text-gray-700 mt-2">{point.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Process Section */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      <section
+        className="animate-section py-16 md:py-20 bg-gray-50"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
+          <h2
+            className="animate-section text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900"
+            ref={registerAnimatedElement}
+          >
             {content.processTitle}
           </h2>
-          <p className="text-lg md:text-xl text-center text-gray-600 mb-12">{content.processSubtitle}</p>
+          <p
+            className="animate-section text-lg md:text-xl text-center text-gray-600 mb-12"
+            ref={registerAnimatedElement}
+          >
+            {content.processSubtitle}
+          </p>
           <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-            {content.processDetails.map((detail) => (
-              <Card key={detail.title} className="border-2 border-gray-200 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">{detail.title}</CardTitle>
-                  <CardDescription className="text-lg text-gray-700 mt-2">{detail.description}</CardDescription>
-                </CardHeader>
-              </Card>
+            {content.processDetails.map((detail, index) => (
+              <div
+                key={detail.title}
+                ref={registerAnimatedElement}
+                className="animate-section"
+                style={{ transitionDelay: `${index * 120}ms` }}
+              >
+                <Card className="card-hover border-2 border-gray-200 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-gray-900">{detail.title}</CardTitle>
+                    <CardDescription className="text-lg text-gray-700 mt-2">{detail.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Guarantee Section */}
-      <section className="py-16 md:py-24 bg-blue-600 text-white">
+      <section
+        className="animate-section py-16 md:py-24 bg-blue-600 text-white"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="animate-section max-w-3xl mx-auto text-center" ref={registerAnimatedElement}>
             <div className="mb-8 flex justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-blue-600">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-blue-600 shadow-2xl">
                 <DollarSign className="h-10 w-10" />
               </div>
             </div>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">{content.guaranteeTitle}</h2>
             <p className="text-xl md:text-2xl mb-8 text-blue-100">{content.guaranteeSubtitle}</p>
-            <div className="bg-white/10 rounded-lg p-6 mb-8 text-left">
+            <div className="bg-white/10 rounded-lg p-6 mb-8 text-left backdrop-blur">
               <p className="text-lg mb-4 font-semibold">Warunki:</p>
               <ul className="space-y-2 text-lg">
                 {content.guaranteeBullets.map((bullet) => (
@@ -873,7 +1015,7 @@ function HomeContent() {
                 ))}
               </ul>
             </div>
-            <Button size="lg" className="text-xl px-12 py-8 h-auto bg-white text-blue-600 hover:bg-gray-100 font-bold shadow-lg" onClick={handleOpenModal}>
+            <Button size="lg" className="hero-cta text-xl px-12 py-6 h-auto bg-white text-blue-600 hover:bg-gray-100 font-bold shadow-lg" onClick={handleOpenModal}>
               {content.heroButton}
             </Button>
             <p className="mt-3 text-base text-blue-100">{content.guaranteeNote}</p>
@@ -882,65 +1024,104 @@ function HomeContent() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 md:py-20 bg-white">
+      <section
+        className="animate-section py-16 md:py-20 bg-white"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+          <h2
+            className="animate-section text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900"
+            ref={registerAnimatedElement}
+          >
             {content.testimonialsTitle}
           </h2>
           <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
-            {content.testimonials.map((testimonial) => (
-              <Card key={testimonial.quote} className="border-2 border-gray-200">
-                <CardHeader>
-                  <div className="mb-4 text-2xl text-yellow-500">★★★★★</div>
-                  <CardDescription className="text-lg text-gray-700">“{testimonial.quote}”</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                </CardContent>
-              </Card>
+            {content.testimonials.map((testimonial, index) => (
+              <div
+                key={testimonial.quote}
+                ref={registerAnimatedElement}
+                className="animate-section"
+                style={{ transitionDelay: `${index * 120}ms` }}
+              >
+                <Card className="card-hover border-2 border-gray-200">
+                  <CardHeader>
+                    <div className="mb-4 text-2xl text-yellow-500">★★★★★</div>
+                    <CardDescription className="text-lg text-gray-700">“{testimonial.quote}”</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="font-semibold text-gray-900">{testimonial.author}</p>
+                  </CardContent>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Extra Testimonials */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      <section
+        className="animate-section py-16 md:py-20 bg-gray-50"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+          <h2
+            className="animate-section text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900"
+            ref={registerAnimatedElement}
+          >
             Dodatkowe opinie
           </h2>
           <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
-            {content.testimonialsExtra.map((testimonial) => (
-              <Card key={testimonial.quote} className="border-2 border-gray-200">
-                <CardHeader>
-                  <div className="mb-4 text-2xl text-yellow-500">★★★★★</div>
-                  <CardDescription className="text-lg text-gray-700">“{testimonial.quote}”</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                </CardContent>
-              </Card>
+            {content.testimonialsExtra.map((testimonial, index) => (
+              <div
+                key={testimonial.quote}
+                ref={registerAnimatedElement}
+                className="animate-section"
+                style={{ transitionDelay: `${index * 120}ms` }}
+              >
+                <Card className="card-hover border-2 border-gray-200">
+                  <CardHeader>
+                    <div className="mb-4 text-2xl text-yellow-500">★★★★★</div>
+                    <CardDescription className="text-lg text-gray-700">“{testimonial.quote}”</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="font-semibold text-gray-900">{testimonial.author}</p>
+                  </CardContent>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 md:py-20 bg-white">
+      <section
+        className="animate-section py-16 md:py-20 bg-white"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+          <h2
+            className="animate-section text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900"
+            ref={registerAnimatedElement}
+          >
             {content.faqTitle}
           </h2>
           <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-            {content.faqItems.map((faq) => (
-              <Card key={faq.question} className="border-2 border-gray-200 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">{faq.question}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-lg text-gray-700">{faq.answer}</CardDescription>
-                </CardContent>
-              </Card>
+            {content.faqItems.map((faq, index) => (
+              <div
+                key={faq.question}
+                ref={registerAnimatedElement}
+                className="animate-section"
+                style={{ transitionDelay: `${index * 120}ms` }}
+              >
+                <Card className="card-hover border-2 border-gray-200 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-gray-900">{faq.question}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-lg text-gray-700">{faq.answer}</CardDescription>
+                  </CardContent>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
@@ -948,9 +1129,12 @@ function HomeContent() {
 
       {/* CTA */}
       {!submitted && (
-        <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 to-blue-100 border-t-4 border-blue-500">
+        <section
+          className="animate-section py-16 md:py-24 bg-gradient-to-br from-blue-50 to-blue-100 border-t-4 border-blue-500"
+          ref={registerAnimatedElement}
+        >
           <div className="container px-4">
-            <div className="max-w-3xl mx-auto text-center">
+            <div className="animate-section max-w-3xl mx-auto text-center" ref={registerAnimatedElement}>
               <div className="mb-4 inline-block px-4 py-2 bg-red-500 text-white rounded-full text-sm font-bold animate-pulse">
                 ⚡ Oferta ograniczona czasowo
               </div>
@@ -986,7 +1170,7 @@ function HomeContent() {
                   Średnia oszczędność: 500-1000 zł na zamówieniu
                 </p>
               </div>
-              <Button size="lg" className="text-xl px-12 py-8 h-auto bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg transform hover:scale-105 transition-transform" onClick={handleOpenModal}>
+              <Button size="lg" className="hero-cta text-xl px-12 py-6 h-auto bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg transform hover:scale-105 transition-transform" onClick={handleOpenModal}>
                 {content.ctaButton}
               </Button>
               <p className="mt-4 text-sm text-gray-600">
@@ -1013,10 +1197,13 @@ function HomeContent() {
 
       {/* Success Message */}
       {submitted && (
-        <section className="py-16 md:py-24 bg-green-50">
+        <section
+          className="animate-section py-16 md:py-24 bg-green-50"
+          ref={registerAnimatedElement}
+        >
           <div className="container px-4">
-            <div className="max-w-2xl mx-auto">
-              <Card className="border-4 border-green-500 bg-white">
+            <div className="animate-section max-w-2xl mx-auto" ref={registerAnimatedElement}>
+              <Card className="card-hover border-4 border-green-500 bg-white">
                 <CardHeader className="text-center">
                   <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-500">
                     <CheckCircle2 className="h-12 w-12 text-white" />
@@ -1035,7 +1222,10 @@ function HomeContent() {
       )}
 
       {/* Footer */}
-      <footer className="border-t-2 bg-gray-900 text-white py-12">
+      <footer
+        className="animate-section border-t-2 bg-gray-900 text-white py-12"
+        ref={registerAnimatedElement}
+      >
         <div className="container px-4">
           <div className="grid gap-8 md:grid-cols-3 text-center md:text-left">
             <div>
