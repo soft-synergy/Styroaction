@@ -4,6 +4,30 @@ import AnalyticsEvent from '../models/AnalyticsEvent';
 
 const router = express.Router();
 
+const blockedIpSet = new Set(
+  (process.env.ANALYTICS_BLOCKED_IPS || '')
+    .split(',')
+    .map((ip) => ip.trim())
+    .filter(Boolean)
+);
+
+const normalizeIp = (ip?: string | null) => {
+  if (!ip) return null;
+  return ip.replace(/^::ffff:/, '').trim();
+};
+
+const getClientIp = (req: Request): string | null => {
+  const header = req.headers['x-forwarded-for'];
+  if (typeof header === 'string' && header.length > 0) {
+    const [first] = header.split(',');
+    return normalizeIp(first);
+  }
+  if (Array.isArray(header) && header.length > 0) {
+    return normalizeIp(header[0]);
+  }
+  return normalizeIp(req.socket.remoteAddress || req.ip);
+};
+
 // Log analytics event
 router.post('/event', async (req: Request, res: Response) => {
   try {
@@ -13,7 +37,25 @@ router.post('/event', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'eventType and variant are required' });
     }
 
-    const event = await AnalyticsEvent.create({ eventType, variant, metadata });
+    const clientIp = getClientIp(req);
+    if (clientIp && blockedIpSet.has(clientIp)) {
+      return res.status(200).json({
+        success: true,
+        skipped: true,
+        reason: 'ip_blocked',
+      });
+    }
+
+    const payload: Record<string, any> = { eventType, variant, metadata };
+
+    if (clientIp) {
+      payload.metadata = {
+        ...(metadata || {}),
+        clientIp,
+      };
+    }
+
+    const event = await AnalyticsEvent.create(payload);
     res.status(201).json({ success: true, eventId: event._id });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
