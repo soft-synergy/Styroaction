@@ -8,6 +8,8 @@ import styrofoamTypeRoutes from './routes/styrofoamTypes';
 import priceRoutes from './routes/prices';
 import adminRoutes from './routes/admin';
 import analyticsRoutes from './routes/analytics';
+import priceListRequestRoutes from './routes/priceListRequests';
+import { startPriceListScheduler, initializePriceListRequests } from './services/priceListScheduler';
 
 dotenv.config();
 
@@ -70,13 +72,41 @@ app.use('/api/styrofoam-types', styrofoamTypeRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/price-list-requests', priceListRequestRoutes);
+
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+  
+  // Initialize price list requests for producers
+  const producerEmails = [
+    'lukasz@styromap.pl',
+    'h.bartkowiak@styropianplus.pl',
+    'info@styropoz.pl',
+    'biuro@arsanit.pl',
+    'g.klient@austrotherm.pl',
+    'rafal.bejster@op.pl',
+    'arkadiusz.dzikiewicz@yetico.com',
+    'justyna.schulz@swisspor.pl',
+    'karolina.galus@swisspor.pl',
+    'p.budiel@izoterm.kepno.pl',
+    'robert.wroblewski@polstyr.com.pl',
+    'zygmunt@izolbet.pl',
+    'mateusz.achcinski@lshpl.com',
+    'justyna.holda@lshpl.com',
+    'info@soft-synergy.com',
+  ];
+  
+  await initializePriceListRequests(producerEmails);
+  
+  // Start scheduler
+  startPriceListScheduler();
 });
 

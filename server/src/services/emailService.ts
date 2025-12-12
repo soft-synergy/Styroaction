@@ -401,3 +401,97 @@ export const sendRequestConfirmationEmail = async (requestIdOrDoc: string | (IRe
   }
 };
 
+export const sendPriceListRequestEmail = async (
+  email: string,
+  producerName: string | undefined,
+  uploadToken: string,
+  isFollowUp: boolean = false,
+  followUpNumber: number = 0
+): Promise<boolean> => {
+  try {
+    const baseUrl = process.env.FRONTEND_URL || 'https://styroaction.pl';
+    const uploadUrl = `${baseUrl}/upload-price-list?token=${uploadToken}&email=${encodeURIComponent(email)}`;
+
+    const greeting = producerName ? `Witaj ${producerName},` : 'Witaj,';
+    const followUpText = isFollowUp
+      ? `<p style="margin-top: 20px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+          To jest ${followUpNumber === 1 ? 'pierwsze' : followUpNumber === 2 ? 'drugie' : 'trzecie'} przypomnienie o przesłanie aktualnego cennika.
+        </p>`
+      : '';
+
+    const emailHTML = `
+      <!DOCTYPE html>
+      <html lang="pl">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Prośba o aktualny cennik - Styroaction</title>
+        </head>
+        <body style="margin: 0; padding: 0; background: #f4f8fb; font-family: 'Segoe UI', Arial, sans-serif; color: #1a2c3d;">
+          <div style="max-width: 640px; margin: 0 auto; padding: 32px 16px;">
+            <div style="background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 50px rgba(12,61,91,0.08); border: 1px solid #e2ecf3;">
+              <div style="background: linear-gradient(135deg, #0c3d5b, #108fdc); padding: 32px;">
+                <img src="https://styroaction.pl/logo.png" alt="Styroaction" style="width: 180px; height: auto; display: block; margin-bottom: 24px;" />
+                <p style="color: rgba(255,255,255,0.85); letter-spacing: 0.2em; text-transform: uppercase; font-size: 13px; margin: 0 0 8px;">Prośba o aktualny cennik</p>
+                <h1 style="color: #fff; font-size: 32px; margin: 0;">Aktualizacja cennika</h1>
+              </div>
+
+              <div style="padding: 32px;">
+                <p style="font-size: 18px; margin: 0 0 16px;">
+                  ${greeting}
+                </p>
+
+                <p style="margin: 0 0 16px; line-height: 1.7;">
+                  Chcielibyśmy poprosić o przesłanie aktualnego cennika Twoich produktów styropianowych. 
+                  Aktualne ceny pozwolą nam lepiej służyć naszym klientom i prezentować Twoją ofertę.
+                </p>
+
+                ${followUpText}
+
+                <div style="margin: 32px 0; text-align: center;">
+                  <a href="${uploadUrl}" 
+                     style="display: inline-block; padding: 16px 32px; background: #0c3d5b; color: #fff; text-decoration: none; border-radius: 999px; font-weight: 600; font-size: 16px;">
+                    Prześlij cennik
+                  </a>
+                </div>
+
+                <p style="margin: 16px 0 0; font-size: 14px; color: #5c768d;">
+                  Lub skopiuj ten link do przeglądarki:<br>
+                  <a href="${uploadUrl}" style="color: #108fdc; word-break: break-all;">${uploadUrl}</a>
+                </p>
+
+                <div style="margin-top: 32px; padding: 20px; border-radius: 16px; background: #f0f5f9; border-left: 4px solid #0c3d5b;">
+                  <p style="margin: 0; font-size: 14px; color: #2b506b; line-height: 1.7;">
+                    <strong>Jak to działa?</strong><br>
+                    Kliknij przycisk powyżej, aby przejść do formularza, gdzie możesz przesłać plik z cennikiem 
+                    (PDF, Excel, CSV lub inny format). Plik zostanie automatycznie przetworzony i dodany do naszej bazy danych.
+                  </p>
+                </div>
+              </div>
+
+              <div style="padding: 20px 32px; background: #f0f5f9; border-top: 1px solid #e2ecf3;">
+                <p style="margin: 0; font-size: 13px; color: #5c768d;">
+                  Styroaction – giełda styropianu • styroaction.pl • +48 576 205 389
+                </p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    await transporter.sendMail({
+      from: SENDER_ADDRESS,
+      to: email,
+      subject: isFollowUp 
+        ? `Przypomnienie: Prośba o aktualny cennik - Styroaction`
+        : `Prośba o aktualny cennik - Styroaction`,
+      html: emailHTML,
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Error sending price list request email:', error);
+    return false;
+  }
+};
+
