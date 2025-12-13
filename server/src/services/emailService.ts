@@ -226,6 +226,7 @@ export const sendPriceBreakdown = async (requestId: string): Promise<boolean> =>
     await transporter.sendMail({
       from: SENDER_ADDRESS,
       to: req.email,
+      replyTo: 'info@soft-synergy.com',
       subject: `Porównanie cen styropianu - Styrtoaction`,
       html: emailHTML,
     });
@@ -390,6 +391,7 @@ export const sendRequestConfirmationEmail = async (requestIdOrDoc: string | (IRe
     await transporter.sendMail({
       from: SENDER_ADDRESS,
       to: request.email,
+      replyTo: 'info@soft-synergy.com',
       subject: 'Styroaction – potwierdzamy przyjęcie zapytania',
       html: emailHTML,
     });
@@ -406,11 +408,15 @@ export const sendPriceListRequestEmail = async (
   producerName: string | undefined,
   uploadToken: string,
   isFollowUp: boolean = false,
-  followUpNumber: number = 0
+  followUpNumber: number = 0,
+  unsubscribeToken?: string
 ): Promise<boolean> => {
   try {
     const baseUrl = process.env.FRONTEND_URL || 'https://styroaction.pl';
     const uploadUrl = `${baseUrl}/upload-price-list?token=${uploadToken}&email=${encodeURIComponent(email)}`;
+    const unsubscribeUrl = unsubscribeToken 
+      ? `${baseUrl}/unsubscribe?token=${unsubscribeToken}&email=${encodeURIComponent(email)}`
+      : '';
 
     const greeting = producerName ? `Witaj ${producerName},` : 'Witaj,';
     const followUpText = isFollowUp
@@ -466,6 +472,17 @@ export const sendPriceListRequestEmail = async (
                     (PDF, Excel, CSV lub inny format). Plik zostanie automatycznie przetworzony i dodany do naszej bazy danych.
                   </p>
                 </div>
+                ${unsubscribeUrl ? `
+                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e2ecf3; text-align: center;">
+                  <p style="margin: 0 0 8px; font-size: 12px; color: #7d91a5;">
+                    Nie chcesz otrzymywać więcej takich wiadomości?
+                  </p>
+                  <a href="${unsubscribeUrl}" 
+                     style="color: #108fdc; font-size: 12px; text-decoration: underline;">
+                    Wypisz się z listy
+                  </a>
+                </div>
+                ` : ''}
               </div>
 
               <div style="padding: 20px 32px; background: #f0f5f9; border-top: 1px solid #e2ecf3;">
@@ -482,6 +499,7 @@ export const sendPriceListRequestEmail = async (
     await transporter.sendMail({
       from: SENDER_ADDRESS,
       to: email,
+      replyTo: 'info@soft-synergy.com',
       subject: isFollowUp 
         ? `Przypomnienie: Prośba o aktualny cennik - Styroaction`
         : `Prośba o aktualny cennik - Styroaction`,

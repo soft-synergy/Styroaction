@@ -11,6 +11,9 @@ export interface IPriceListRequest extends Document {
   uploadedFileUrl?: string;
   uploadedFileName?: string;
   uploadToken?: string;
+  unsubscribed: boolean;
+  unsubscribeToken?: string;
+  unsubscribedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +55,18 @@ const PriceListRequestSchema: Schema = new Schema(
     uploadToken: {
       type: String,
       index: true,
+    },
+    unsubscribed: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    unsubscribeToken: {
+      type: String,
+      index: true,
+    },
+    unsubscribedAt: {
+      type: Date,
     },
   },
   {

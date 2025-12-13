@@ -75,14 +75,17 @@ router.post('/', async (req: Request, res: Response) => {
     let request = await PriceListRequestModel.findOne({ email });
 
     if (!request) {
-      // Generate upload token
+      // Generate tokens
       const uploadToken = crypto.randomBytes(32).toString('hex');
+      const unsubscribeToken = crypto.randomBytes(32).toString('hex');
 
       request = new PriceListRequestModel({
         email,
         producerName,
         status: 'pending',
         followUpCount: 0,
+        uploadToken,
+        unsubscribeToken,
       });
 
       await request.save();
@@ -176,7 +179,12 @@ router.post('/:id/send', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Request not found' });
     }
 
+    if (request.unsubscribed) {
+      return res.status(400).json({ error: 'This email has been unsubscribed' });
+    }
+
     const uploadToken = crypto.randomBytes(32).toString('hex');
+    const unsubscribeToken = request.unsubscribeToken || crypto.randomBytes(32).toString('hex');
     const isFollowUp = request.followUpCount > 0;
 
     const success = await sendPriceListRequestEmail(
@@ -184,7 +192,8 @@ router.post('/:id/send', async (req: Request, res: Response) => {
       request.producerName,
       uploadToken,
       isFollowUp,
-      request.followUpCount
+      request.followUpCount,
+      unsubscribeToken
     );
 
     if (success) {
@@ -192,6 +201,7 @@ router.post('/:id/send', async (req: Request, res: Response) => {
       request.lastSentAt = new Date();
       request.followUpCount += 1;
       request.uploadToken = uploadToken; // Store token for verification
+      request.unsubscribeToken = unsubscribeToken; // Store unsubscribe token
 
       // Set next follow-up date (7 days from now)
       const nextDate = new Date();
@@ -230,6 +240,69 @@ router.post('/:id/reset', async (req: Request, res: Response) => {
     }
 
     res.json(request);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Unsubscribe endpoint (public)
+router.post('/unsubscribe', async (req: Request, res: Response) => {
+  try {
+    const { token, email } = req.body;
+
+    if (!token || !email) {
+      return res.status(400).json({ error: 'Token and email are required' });
+    }
+
+    const request = await PriceListRequestModel.findOne({ 
+      email: email as string,
+      unsubscribeToken: token,
+    });
+
+    if (!request) {
+      return res.status(404).json({ error: 'Invalid unsubscribe link' });
+    }
+
+    if (request.unsubscribed) {
+      return res.json({ 
+        message: 'Ten adres email został już wypisany z listy',
+        alreadyUnsubscribed: true 
+      });
+    }
+
+    request.unsubscribed = true;
+    request.unsubscribedAt = new Date();
+    await request.save();
+
+    res.json({ 
+      message: 'Zostałeś wypisany z listy. Nie będziesz już otrzymywać wiadomości o cennikach.',
+      success: true 
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Verify unsubscribe token (for frontend)
+router.get('/verify-unsubscribe/:token', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const request = await PriceListRequestModel.findOne({ 
+      email: email as string,
+      unsubscribeToken: token,
+    });
+
+    if (!request) {
+      return res.status(404).json({ error: 'Invalid unsubscribe link' });
+    }
+
+    res.json({ valid: true, alreadyUnsubscribed: request.unsubscribed || false });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

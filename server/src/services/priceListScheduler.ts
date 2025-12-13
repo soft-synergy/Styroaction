@@ -13,7 +13,9 @@ export const sendScheduledPriceListRequests = async () => {
     // Find requests that need to be sent:
     // 1. Pending requests that haven't been sent yet
     // 2. Sent requests that need follow-up (nextFollowUpAt <= now and followUpCount < MAX_FOLLOW_UPS)
+    // Exclude unsubscribed emails
     const requestsToSend = await PriceListRequestModel.find({
+      unsubscribed: { $ne: true },
       $or: [
         { status: 'pending', lastSentAt: null },
         {
@@ -28,7 +30,13 @@ export const sendScheduledPriceListRequests = async () => {
 
     for (const request of requestsToSend) {
       try {
+        // Skip if unsubscribed (double check)
+        if (request.unsubscribed) {
+          continue;
+        }
+
         const uploadToken = crypto.randomBytes(32).toString('hex');
+        const unsubscribeToken = request.unsubscribeToken || crypto.randomBytes(32).toString('hex');
         const isFollowUp = request.followUpCount > 0;
 
         const success = await sendPriceListRequestEmail(
@@ -36,7 +44,8 @@ export const sendScheduledPriceListRequests = async () => {
           request.producerName,
           uploadToken,
           isFollowUp,
-          request.followUpCount
+          request.followUpCount,
+          unsubscribeToken
         );
 
         if (success) {
@@ -44,6 +53,7 @@ export const sendScheduledPriceListRequests = async () => {
           request.lastSentAt = new Date();
           request.followUpCount += 1;
           request.uploadToken = uploadToken; // Store token for verification
+          request.unsubscribeToken = unsubscribeToken; // Store unsubscribe token
 
           // Set next follow-up date (7 days from now)
           const nextDate = new Date();
@@ -77,13 +87,23 @@ export const initializePriceListRequests = async (emails: string[]) => {
       const existing = await PriceListRequestModel.findOne({ email });
       
       if (!existing) {
+        // Generate tokens
+        const uploadToken = crypto.randomBytes(32).toString('hex');
+        const unsubscribeToken = crypto.randomBytes(32).toString('hex');
+
         const request = new PriceListRequestModel({
           email,
           status: 'pending',
           followUpCount: 0,
+          uploadToken,
+          unsubscribeToken,
         });
         await request.save();
         console.log(`Initialized price list request for ${email}`);
+      } else if (!existing.unsubscribeToken) {
+        // Generate unsubscribe token for existing requests that don't have one
+        existing.unsubscribeToken = crypto.randomBytes(32).toString('hex');
+        await existing.save();
       }
     }
   } catch (error) {
