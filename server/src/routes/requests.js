@@ -47,7 +47,7 @@ router.post('/', function (req, res) { return __awaiter(void 0, void 0, void 0, 
             case 0:
                 _b.trys.push([0, 3, , 4]);
                 _a = req.body, name_1 = _a.name, email = _a.email, phone = _a.phone, company = _a.company, postalCode = _a.postalCode, styrofoamType = _a.styrofoamType, quantity = _a.quantity;
-                if (!name_1 || !email || !postalCode || !styrofoamType) {
+                if (!name_1 || !email || !postalCode || !styrofoamType || !phone) {
                     return [2 /*return*/, res.status(400).json({ error: 'Missing required fields' })];
                 }
                 newRequest = new Request_1.default({

@@ -125,11 +125,12 @@ export default function ProducersManager({ token }: ProducersManagerProps) {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Telefon</label>
+                <label>Telefon *</label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  required
                 />
               </div>
               <div className={styles.formGroup}>

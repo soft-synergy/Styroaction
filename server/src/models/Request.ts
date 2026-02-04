@@ -13,7 +13,7 @@ export interface IGuidedItem {
 export interface IRequest extends Document {
   name: string;
   email: string;
-  phone?: string;
+  phone: string;
   company?: string;
   postalCode: string;
   styrofoamType?: mongoose.Types.ObjectId;
@@ -71,6 +71,8 @@ const RequestSchema: Schema = new Schema(
     },
     phone: {
       type: String,
+      required: true,
+      trim: true,
     },
     company: {
       type: String,

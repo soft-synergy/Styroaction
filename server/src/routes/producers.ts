@@ -37,6 +37,10 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Name is required' });
     }
 
+    if (!phone) {
+      return res.status(400).json({ error: 'Phone is required' });
+    }
+
     const producer = new ProducerModel({
       name,
       email,

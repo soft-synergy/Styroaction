@@ -23,7 +23,7 @@ router.post('/', async (req: Request, res: Response) => {
       notes,
     } = req.body;
 
-    if (!name || !email || !postalCode) {
+    if (!name || !email || !postalCode || !phone) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 

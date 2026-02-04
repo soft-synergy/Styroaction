@@ -37,6 +37,8 @@ var RequestSchema = new mongoose_1.Schema({
     },
     phone: {
         type: String,
+        required: true,
+        trim: true,
     },
     company: {
         type: String,

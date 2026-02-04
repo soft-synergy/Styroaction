@@ -179,6 +179,9 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
     setError('');
 
     try {
+      if (!contactData.phone.trim()) {
+        throw new Error('Podaj numer telefonu – jest wymagany.');
+      }
       if (requestMode === 'manual' && !manualDetails.trim()) {
         throw new Error('Opisz w kilku zdaniach czego szukasz – konsultant zadzwoni i dokończy za Ciebie.');
       }
@@ -225,7 +228,7 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
       const requestPayload = {
         name: contactData.name,
         email: contactData.email,
-        phone: contactData.phone || undefined,
+        phone: contactData.phone.trim(),
         company: contactData.company || undefined,
         postalCode: contactData.postalCode,
         styrofoamType: primaryStyrofoamType,
@@ -631,7 +634,7 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
 
             <div>
               <Label htmlFor="phone" className="text-lg font-semibold text-gray-900 mb-2 block">
-                Telefon (opcjonalnie)
+                Telefon *
               </Label>
               <Input
                 type="tel"
@@ -640,10 +643,11 @@ export default function RequestForm({ styrofoamTypes, variant, onSubmit, onCance
                 value={contactData.phone}
                 onChange={handleContactChange}
                 placeholder="123 456 789"
+                required
                 className="text-lg h-14 border-2 border-gray-300"
               />
               <p className="mt-2 text-sm text-gray-600">
-                Podaj jeśli chcesz, żeby konsultant zadzwonił w razie pytań.
+                Podaj numer telefonu, żebyśmy mogli potwierdzić szczegóły, jeśli będzie taka potrzeba.
               </p>
             </div>
 
